@@ -1,0 +1,95 @@
+<!--
+
+    THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS
+    FOR A PARTICULAR PURPOSE. THIS CODE AND INFORMATION ARE NOT SUPPORTED BY XEBIALABS.
+
+-->
+<rules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.xebialabs.com/xl-deploy/xl-rules" >
+
+    <rule name="salt.Minion.CREATE" scope="deployed">
+        <conditions>
+            <type>salt.Minion</type>
+            <operation>CREATE</operation>
+        </conditions>
+        <steps>
+            <os-script>
+                <description expression="true">"Create minion: %s from Salt-Cloud using profile: %s " % (deployed.minionName,deployed.profileName)</description>
+                <script>salt/create-minion</script>
+                <order>60</order>
+            </os-script>
+        </steps>
+    </rule>
+    <rule name="salt.Minion.DESTROY" scope="deployed">
+        <conditions>
+            <type>salt.Minion</type>
+            <operation>DESTROY</operation>
+        </conditions>
+        <steps>
+            <os-script>
+                <description expression="true">"Destroying minion: %s " % (previousDeployed.minionName)</description>
+                <script>salt/destroy-minion</script>
+                <order>40</order>
+            </os-script>
+        </steps>
+    </rule>
+    <rule name="salt.File.CREATE_MODIFY" scope="deployed">
+        <conditions>
+            <type>salt.File</type>
+            <operation>CREATE</operation>
+            <operation>MODIFY</operation>
+        </conditions>
+        <steps>
+            <os-script>
+                <description expression="true">"Applying state file: %s on minion: %s" % (deployed.stateFileName, deployed.container.name)</description>
+                <script>salt/apply-state</script>
+                <order>61</order>
+            </os-script>
+        </steps>
+    </rule>
+
+    <rule name="salt.File.NOOP" scope="deployed">
+        <conditions>
+            <type>salt.File</type>
+            <operation>NOOP</operation>
+            <expression>deployed.applyOnNoop</expression>
+        </conditions>
+        <steps>
+            <os-script>
+                <description expression="true">"Applying state file: %s on minion: %s" % (deployed.stateFileName, deployed.container.name)</description>
+                <script>salt/apply-state</script>
+                <order>61</order>
+            </os-script>
+        </steps>
+    </rule>
+    <rule name="salt.Formula.CREATE_MODIFY" scope="deployed">
+        <conditions>
+            <type>salt.Formula</type>
+            <operation>CREATE</operation>
+            <operation>MODIFY</operation>
+        </conditions>
+        <steps>
+            <os-script>
+                <description expression="true">"Applying formula: %s on minion: %s" % (deployed.formulaName, deployed.container.name)</description>
+                <script>salt/apply-formula</script>
+                <order>61</order>
+            </os-script>
+        </steps>
+    </rule>
+
+    <rule name="salt.Formula.NOOP" scope="deployed">
+        <conditions>
+            <type>salt.Formula</type>
+            <operation>NOOP</operation>
+            <expression>deployed.applyOnNoop</expression>
+        </conditions>
+        <steps>
+            <os-script>
+                <description expression="true">"Applying formula: %s on minion: %s" % (deployed.formulaName, deployed.container.name)</description>
+                <script>salt/apply-formula</script>
+                <order>61</order>
+            </os-script>
+        </steps>
+    </rule>
+</rules>

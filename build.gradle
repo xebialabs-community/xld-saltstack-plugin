@@ -1,0 +1,24 @@
+plugins {
+    id "com.github.hierynomus.license" version "0.14.0"
+    id "com.xebialabs.xldp" version "1.0.5"
+}
+
+version = '1.0.0'
+
+apply plugin: "com.github.hierynomus.license"
+apply plugin: 'java'
+apply plugin: 'idea'
+
+processResources {
+    filesMatching('**/plugin-version.properties') {
+        expand(
+                'project_version': version.toString(),
+                'project_name': rootProject.name
+        )
+    }
+}
+
+license {
+    header rootProject.file('src/main/license/xebialabs_community.license')
+    strictCheck true
+}

@@ -1,0 +1,39 @@
+<!--
+
+    THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS
+    FOR A PARTICULAR PURPOSE. THIS CODE AND INFORMATION ARE NOT SUPPORTED BY XEBIALABS.
+
+-->
+<synthetic xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.xebialabs.com/deployit/synthetic" xsi:schemaLocation="http://www.xebialabs.com/deployit/synthetic synthetic.xsd">
+
+    <type type="salt.MasterContainer" extends="udm.BaseContainer">
+        <property name="host" kind="ci" referenced-type="overthere.Host" as-containment="true"/>
+        <property name="saltCloudPath" default="/usr/bin" required="false" description="Salt cloud binary directory path."/>
+    </type>
+    <type type="salt.MinionContainer" extends="udm.BaseContainer">
+        <property name="host" kind="ci" referenced-type="overthere.Host" as-containment="true"/>
+        <property name="saltCallPath" default="/usr/bin" required="true" description="Salt call binary directory path."/>
+        <property name="statesDir" default="/srv/salt" required="true" description="Directory were state files are saved"/>
+        <property name="pillarDir" default="/srv/pillar" required="true" description="Directory were pillar files are saved"/>
+    </type>
+
+    <type type="salt.Minion" deployable-type="salt.MinionSpec" container-type="salt.MasterContainer" extends="udm.BaseDeployed" description="Salt minion created by a salt-cloud profile">
+        <generate-deployable type="salt.MinionSpec" extends="udm.BaseDeployable" description="Salt minion created by a salt-cloud profile"/>
+        <property name="profileName" hidden="false" required="true" description="Salt cloud profile which is available on Salt Master"/>
+        <property name="minionName" hidden="false" required="true" description="Name of the minion that will be created"/>
+    </type>
+
+    <type type="salt.File" deployable-type="salt.FileSpec" container-type="salt.MinionContainer" extends="udm.BaseDeployedArtifact" description="Simple Salt file that include multiple states">
+        <generate-deployable type="salt.FileSpec" extends="udm.BaseDeployableFileArtifact" description="Simple Salt file that include multiple states"/>
+        <property name="stateFileName" hidden="false" required="true" description="Name of state file to be applied"/>
+        <property name="applyOnNoop" required="false" kind="boolean" default="false" description="Apply state file on NOOP operation." category="Advanced"/>
+    </type>
+    <type type="salt.Formula" deployable-type="salt.FormulaSpec" container-type="salt.MinionContainer" extends="udm.BaseDeployedArtifact" description="Folder that represent a salt formula">
+        <generate-deployable type="salt.FormulaSpec" extends="udm.BaseDeployableArchiveArtifact" description="Folder that represent a salt formula"/>
+        <property name="formulaName" hidden="false" required="true" description="Name of formula to be applied"/>
+        <property name="applyOnNoop" required="false" kind="boolean" default="false" description="Apply formula on NOOP operation." category="Advanced"/>
+    </type>
+
+</synthetic>
